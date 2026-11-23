@@ -88,7 +88,7 @@ h3{font-size:20px;margin-bottom:8px}
 .replay .play svg{width:14px;height:14px;fill:currentColor}
 .replay .play:hover{background:var(--accent2)}
 .days{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;padding:2px}
-.dchip{flex:1 0 auto;min-width:46px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:4px 8px;line-height:1.15;font-size:11px;font-weight:600;text-align:center}
+.dchip{flex:0 0 auto;min-width:56px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:4px 8px;line-height:1.15;font-size:11px;font-weight:600;text-align:center}
 .dchip b{display:block;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums}
 .dchip:hover{border-color:var(--accent);color:var(--text)}
 .dchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#081742}
@@ -277,7 +277,7 @@ function setData(D,src){DATA=D;SRC=src;C=compute(D);if(!C.ops.find(o=>o.id===sel
 
 /* ---- CONFIGURAÇÃO: id da planilha (trecho entre /d/ e /edit na URL do Google Sheets) ---- */
 const SHEET_ID='1K_5SCBCn_GwvsXUisJh7eHrvti7BPxIkZDgqr5CrP8s';
-const BUILD='20261123141038';
+const BUILD='20261123141315';
 const REFRESH_MS=2*60*1000;
 const EXPECT={config:['chave','valor'],operadores:['nome','equipe'],lancamentos:['data','operador'],casas:['casa','premio'],premios:['nome','icone'],entregas:['operador','casa']};
 const TABNAME={config:'Config',operadores:'Operadores',lancamentos:'Lancamentos',casas:'Casas',premios:'Premios',entregas:'Entregas'};
@@ -303,7 +303,7 @@ async function loadSheet(){
     const {D,warn}=parseWorkbook(wb);
     if(!D.operadores.length)throw new Error('A aba Operadores está vazia ou ilegível.');
     const js=JSON.stringify(D),mudou=js!==LOAD.json;
-    LOAD={warn,erro:null,quando:new Date(),json:js};
+    LOAD={warn,erro:null,quando:new Date(),json:js};tickLastRead();
     if(mudou){try{localStorage.setItem('nd_cache',js);}catch(e){}setData(D,{tipo:'planilha',quando:new Date().toISOString()});}
     else if(tab==='gestor')render();
   }catch(e){
@@ -521,9 +521,18 @@ function cellInfo(n){
    7) TELAS
    ========================================================= */
 const TABS=[['mapa','Mapa'],['ranking','Ranking'],['painel','Meu painel'],['premios','Prêmios'],['regras','Regras'],['gestor','Gestor']];
+function lastReadTxt(){
+  const q=(LOAD&&LOAD.quando)||(SRC&&SRC.quando&&new Date(SRC.quando));
+  if(!q||SRC.tipo==='demo')return 'Dados de demonstração';
+  const hh=q.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),min=Math.floor((Date.now()-q.getTime())/60000);
+  const rel=min<1?'agora':min<60?'há '+min+' min':'há '+Math.floor(min/60)+' h';
+  return (SRC.tipo==='cache'?'Última leitura salva: ':'Planilha lida às ')+hh+' ('+rel+')';
+}
+function tickLastRead(){const e=document.getElementById('lastRead');if(e)e.textContent=lastReadTxt();}
+setInterval(tickLastRead,30000);
 function renderHead(){
   const dia=C.dates.length,tot=C.dias;
-  document.getElementById('meta').innerHTML=(C.ultimo?`<span class="pill">Dia ${Math.min(dia,tot)} de ${tot}</span><span>Atualizado até ${fmtD(C.ultimo)}</span>`:'')+
+  document.getElementById('meta').innerHTML=(C.ultimo?`<span class="pill">Dia ${Math.min(dia,tot)} de ${tot}</span><span>Resultados até ${fmtD(C.ultimo)}</span>`:'')+`<span id="lastRead" class="pill">${lastReadTxt()}</span>`+
     (SRC.tipo==='demo'||DATA.config.exemplo?`<span class="pill warn">Dados de exemplo</span>`:SRC.tipo==='cache'?`<span class="pill warn">Sem conexão, última leitura salva</span>`:'');
   document.getElementById('tabs').innerHTML=TABS.filter(([k])=>k!=='gestor'||location.hash==='#gestor').map(([k,l])=>`<button role="tab" aria-selected="${k===tab}" data-tab="${k}">${l}</button>`).join('');
   const lg=document.getElementById('logos');
@@ -646,7 +655,7 @@ function coachHTML(o){
    <div class="legend" style="margin:0 0 6px">${goals.map(x=>`<button class="chip plain ${x.key===g.key?'on':''}" data-goal="${esc(x.key)}">${esc(x.label)} · ${x.h}</button>`).join('')}</div>
    <div class="verdict ${cls}"><span class="vi">${icon}</span><span>${v}</span></div>
    <div class="facts"><div class="fact"><span>Pontos que faltam</span><b>${need}</b></div><div class="fact"><span>Dias restantes</span><b>${left}</b></div><div class="fact"><span>Por dia, para chegar</span><b>${ppd===Infinity?'—':ppd}</b></div>
-     <div class="fact"><span>Você está na casa</span><b>${o.pos}</b></div><div class="fact"><span>Destino</span><b>casa ${g.h}</b></div><div class="fact"><span>No ritmo atual</span><b style="font-size:14px">${when}</b></div></div>
+     <div class="fact"><span>Você tem</span><b>${o.pos} pontos</b></div><div class="fact"><span>Objetivo</span><b>${g.h} pontos</b></div><div class="fact"><span>No ritmo atual</span><b style="font-size:14px">${when}</b></div></div>
    ${plan?`<div><small style="color:var(--muted)">Plano diário para chegar à casa ${g.h} para ${dest}:</small><div class="plan">${plan}</div></div>`:''}
    ${mix?`<div class="mix"><b>Receita para um dia de ${ppd} ${ppd===1?'ponto':'pontos'}:</b> ${mix}.<br><small style="color:var(--muted)">Baseada no que você mais faz. Cada atraso ou falta tira 1 ponto. ${esc(eqNote)}</small></div>`:''}
    ${C.modo==='pouso'?`<p class="sub" style="margin:10px 0 0">Nesta campanha o prêmio vale quando você <b>para</b> na casa no fim do dia. Feche o dia exatamente na casa ${g.h}.</p>`:''}
