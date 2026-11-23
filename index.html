@@ -277,6 +277,7 @@ function setData(D,src){DATA=D;SRC=src;C=compute(D);if(!C.ops.find(o=>o.id===sel
 
 /* ---- CONFIGURAÇÃO: id da planilha (trecho entre /d/ e /edit na URL do Google Sheets) ---- */
 const SHEET_ID='1K_5SCBCn_GwvsXUisJh7eHrvti7BPxIkZDgqr5CrP8s';
+const BUILD='20261123140711';
 const REFRESH_MS=2*60*1000;
 const EXPECT={config:['chave','valor'],operadores:['nome','equipe'],lancamentos:['data','operador'],casas:['casa','premio'],premios:['nome','icone'],entregas:['operador','casa']};
 const TABNAME={config:'Config',operadores:'Operadores',lancamentos:'Lancamentos',casas:'Casas',premios:'Premios',entregas:'Entregas'};
@@ -455,14 +456,17 @@ function layout(count,special){
   const n=Math.min(count,9);return Array.from({length:n},(_,i)=>[(i%3-1)*24,(Math.floor(i/3)-1)*24,.56]);
 }
 function tokenSVG(o,x,y,sc,i){
-  const u=avUrl(o),id='cp'+o.id.replace(/[^a-z0-9]/g,'')+i,w=38*sc,h=52*sc;
-  return `<g class="tok" data-op="${o.id}" style="transform:translate(${(x-w/2).toFixed(1)}px,${(y-h*0.62).toFixed(1)}px)"><title>${esc(short(o))} · casa ${o.pos}</title>
+  sc*=.85;const u=avUrl(o),id='cp'+o.id.replace(/[^a-z0-9]/g,'')+i,w=38*sc,h=66*sc,c=esc(o.cor);
+  return `<g class="tok" data-op="${o.id}" style="transform:translate(${(x-w/2).toFixed(1)}px,${(y-h*0.7).toFixed(1)}px)"><title>${esc(short(o))} · ${o.pos} pontos</title>
    <g transform="scale(${sc})"><g class="bob" style="animation-delay:${(i*.27).toFixed(2)}s">
-    <ellipse cx="19" cy="50" rx="17" ry="5" fill="rgba(0,0,0,.45)"/>
-    <path d="M7 47 L12 36 L26 36 L31 47 Z" fill="${esc(o.cor)}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="19" cy="19" r="19" fill="${esc(o.cor)}" stroke="#fff" stroke-width="3"/>
-    ${u?`<clipPath id="${id}"><circle cx="19" cy="19" r="17"/></clipPath><image href="${esc(u)}" x="2" y="2" width="34" height="34" clip-path="url(#${id})" preserveAspectRatio="xMidYMin slice"/>`
-       :`<text x="19" y="25" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-weight="800" font-size="16" fill="#fff" stroke="rgba(0,0,0,.45)" stroke-width="2.5" paint-order="stroke">${esc(initials(o.apelido||o.nome).toUpperCase())}</text>`}
+    <ellipse cx="19" cy="63" rx="14" ry="4" fill="rgba(0,0,0,.45)"/>
+    <path d="M13.5 47V58M24.5 47V58" stroke="#fff" stroke-width="7.5" stroke-linecap="round"/><path d="M13.5 47V58M24.5 47V58" stroke="#12295f" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="13" cy="60.5" rx="5" ry="2.6" fill="#fff"/><ellipse cx="25" cy="60.5" rx="5" ry="2.6" fill="#fff"/>
+    <path d="M8 37L3.5 47M30 37L34.5 47" stroke="#fff" stroke-width="7.5" stroke-linecap="round"/><path d="M8 37L3.5 47M30 37L34.5 47" stroke="${c}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M9 32Q9 30 12 30H26Q29 30 29 32L30.5 49Q30.5 51 28.5 51H9.5Q7.5 51 7.5 49Z" fill="${c}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="19" cy="16" r="16" fill="${c}" stroke="#fff" stroke-width="3"/>
+    ${u?`<clipPath id="${id}"><circle cx="19" cy="16" r="14.5"/></clipPath><image href="${esc(u)}" x="3.5" y="1.5" width="31" height="31" clip-path="url(#${id})" preserveAspectRatio="xMidYMin slice"/>`
+       :`<text x="19" y="22" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-weight="800" font-size="15" fill="#fff" stroke="rgba(0,0,0,.45)" stroke-width="2.5" paint-order="stroke">${esc(initials(o.apelido||o.nome).toUpperCase())}</text>`}
    </g></g></g>`;
 }
 function drawTokens(){
@@ -749,7 +753,9 @@ window.addEventListener('hashchange',()=>{if(location.hash!=='#gestor'&&tab==='g
 if(location.hash==='#gestor')tab='gestor';
 render();probeAssets();
 loadSheet();
-setInterval(loadSheet,REFRESH_MS);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet();});
+setInterval(loadSheet,REFRESH_MS);
+async function checkVersion(){try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});if(!r.ok)return;const m=(await r.text()).match(/const BUILD='([^']+)'/);if(m&&m[1]!==BUILD)location.reload();}catch(e){}}
+setInterval(checkVersion,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){loadSheet();checkVersion();}});
 </script>
 </body>
 </html>
