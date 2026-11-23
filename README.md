@@ -10,7 +10,7 @@ Jogo de tabuleiro da campanha, alimentado por uma planilha do Google. Você só 
 ## Rotina diária (2 minutos)
 1. Abra a planilha e vá na aba **Lancamentos**.
 2. Para cada operador, adicione uma linha: data, nome (escolha na lista), pagamento, acordo, meta (1 ou 0), localização, atrasos, monitoria.
-3. Pronto. Quem estiver com o jogo aberto vê a mudança em até 5 minutos. Para ver na hora, abra o jogo com `#gestor` no final do endereço e clique em **Atualizar agora**. Essa tela também lista avisos, como nome de operador digitado errado.
+3. Pronto. Quem estiver com o jogo aberto vê a mudança em até 2 a 3 minutos. Para ver na hora, abra o jogo com `#gestor` no final do endereço e clique em **Atualizar agora**. Essa tela também lista avisos, como nome de operador digitado errado.
 
 ## Antes de abrir para valer
 - Aba **Config**: troque `exemplo` de `sim` para `nao` e apague as linhas de exemplo em Lancamentos.

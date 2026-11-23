@@ -275,7 +275,7 @@ function setData(D,src){DATA=D;SRC=src;C=compute(D);if(!C.ops.find(o=>o.id===sel
 
 /* ---- CONFIGURAÇÃO: id da planilha (trecho entre /d/ e /edit na URL do Google Sheets) ---- */
 const SHEET_ID='1K_5SCBCn_GwvsXUisJh7eHrvti7BPxIkZDgqr5CrP8s';
-const REFRESH_MS=5*60*1000;
+const REFRESH_MS=2*60*1000;
 const EXPECT={config:['chave','valor'],operadores:['nome','equipe'],lancamentos:['data','operador'],casas:['casa','premio'],premios:['nome','icone'],entregas:['operador','casa']};
 const TABNAME={config:'Config',operadores:'Operadores',lancamentos:'Lancamentos',casas:'Casas',premios:'Premios',entregas:'Entregas'};
 function parseCSV(t){const rows=[];let r=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
@@ -748,7 +748,7 @@ window.addEventListener('hashchange',()=>{if(location.hash!=='#gestor'&&tab==='g
 if(location.hash==='#gestor')tab='gestor';
 render();probeAssets();
 loadSheet();
-setInterval(loadSheet,REFRESH_MS);
+setInterval(loadSheet,REFRESH_MS);document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSheet();});
 </script>
 </body>
 </html>
