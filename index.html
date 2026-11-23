@@ -284,7 +284,7 @@ function parseCSV(t){const rows=[];let r=[],f='',q=false;for(let i=0;i<t.length;
   else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);rows.push(r);r=[];f='';}else f+=c;}
   if(f!==''||r.length){r.push(f);rows.push(r);}return rows;}
 async function fetchTab(key){
-  const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(TABNAME[key]);
+  const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(TABNAME[key]);
   const res=await fetch(url,{cache:'no-store'});
   if(!res.ok)throw new Error('A planilha não respondeu (código '+res.status+'). Confira se o compartilhamento está como "qualquer pessoa com o link".');
   const rows=parseCSV(await res.text()).filter(r=>r.some(c=>String(c).trim()!==''));
