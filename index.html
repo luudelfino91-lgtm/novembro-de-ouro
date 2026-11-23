@@ -55,7 +55,7 @@ main{padding:20px 0 60px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .col{display:flex;flex-direction:column;gap:16px}
 .grid2>*,.grid3>*{min-width:0}
-.gbottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.gbottom>*{min-width:0;margin:0}
+.feed{max-height:420px;overflow:auto;padding-right:4px}.gbottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.gbottom>*{min-width:0;margin:0}
 @media(max-width:900px){.gbottom{grid-template-columns:1fr}}
 @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
 h2{font-size:26px;margin-bottom:6px}
@@ -277,7 +277,7 @@ function setData(D,src){DATA=D;SRC=src;C=compute(D);if(!C.ops.find(o=>o.id===sel
 
 /* ---- CONFIGURAÇÃO: id da planilha (trecho entre /d/ e /edit na URL do Google Sheets) ---- */
 const SHEET_ID='1K_5SCBCn_GwvsXUisJh7eHrvti7BPxIkZDgqr5CrP8s';
-const BUILD='20261123140959';
+const BUILD='20261123141038';
 const REFRESH_MS=2*60*1000;
 const EXPECT={config:['chave','valor'],operadores:['nome','equipe'],lancamentos:['data','operador'],casas:['casa','premio'],premios:['nome','icone'],entregas:['operador','casa']};
 const TABNAME={config:'Config',operadores:'Operadores',lancamentos:'Lancamentos',casas:'Casas',premios:'Premios',entregas:'Entregas'};
@@ -449,11 +449,11 @@ function boardSVG(){
 }
 /* peões: avatar redondo (foto ou iniciais) sobre uma base, como os bonecos do mural */
 function layout(count,special){
-  if(special){const cols=3,sp=30,n=Math.min(count,9);return Array.from({length:n},(_,i)=>[(i%cols-1)*sp,(Math.floor(i/cols)-1)*30+4,.62]);}
+  if(special){const cols=count>9?4:3,sp=count>9?26:30,n=Math.min(count,16),rows=Math.ceil(n/cols);return Array.from({length:n},(_,i)=>[(i%cols-(cols-1)/2)*sp,(Math.floor(i/cols)-(rows-1)/2)*sp+4,count>9?.5:.62]);}
   if(count===1)return [[0,0,1]];
   if(count===2)return [[-21,0,.9],[21,0,.9]];
   if(count<=4)return [[-20,-12,.72],[20,-12,.72],[-20,14,.72],[20,14,.72]].slice(0,count);
-  const n=Math.min(count,9);return Array.from({length:n},(_,i)=>[(i%3-1)*24,(Math.floor(i/3)-1)*24,.56]);
+  const cols=count>9?4:3,n=Math.min(count,16),rows=Math.ceil(n/cols),sp=count>9?20:24,sc=count>9?.46:.56;return Array.from({length:n},(_,i)=>[(i%cols-(cols-1)/2)*sp,(Math.floor(i/cols)-(rows-1)/2)*sp,sc]);
 }
 function tokenSVG(o,x,y,sc,i){
   const u=avUrl(o),id='cp'+o.id.replace(/[^a-z0-9]/g,'')+i,w=38*sc,h=52*sc;
@@ -533,7 +533,7 @@ function legendHTML(st){return st.rk.map(r=>`<button class="chip" data-op="${r.o
 function sideHTML(st){
   const teams=Object.entries(st.teams).map(([t,v])=>`<div class="team"><span>${esc(t)}</span><b>${v.pontos}</b><small>pontos · ${v.n} jogadores</small></div>`).join('');
   const lead=st.rk[0];
-  const feed=st.feed.slice(0,6).map(f=>{const o=C.ops.find(x=>x.nome===f.operador);return `<li>${o?avHTML(o,34):`<span class="ic">${esc(f.premio.icone)}</span>`}<div><b>${esc(f.apelido)}</b> conquistou ${esc(f.premio.icone)} ${esc(f.premio.nome)}<small>Casa ${f.casa} · ${fmtD(f.data)}</small></div></li>`;}).join('');
+  const feed=st.feed.map(f=>{const o=C.ops.find(x=>x.nome===f.operador);return `<li>${o?avHTML(o,34):`<span class="ic">${esc(f.premio.icone)}</span>`}<div><b>${esc(f.apelido)}</b> conquistou ${esc(f.premio.icone)} ${esc(f.premio.nome)}<small>Casa ${f.casa} · ${fmtD(f.data)}</small></div></li>`;}).join('');
   return `<section class="panel"><h3>Placar das equipes</h3><div class="teamrow">${teams||'<div class="empty">Sem dados.</div>'}</div>
      ${lead?`<p class="sub" style="margin:0">Na frente: <b style="color:var(--text)">${esc(short(lead.o))}</b>, com ${lead.pos} pontos.</p>`:''}</section>
    <section class="panel"><h3>Conquistas</h3>${feed?`<ul class="feed">${feed}</ul>`:'<div class="empty">Nenhum prêmio conquistado até aqui.</div>'}</section>`;
