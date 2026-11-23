@@ -1,0 +1,3 @@
+Coloque aqui as fotos dos operadores (JPG ou PNG).
+Depois escreva o nome do arquivo na coluna Foto da aba Operadores da planilha.
+Exemplo: mariana-palermo.jpg

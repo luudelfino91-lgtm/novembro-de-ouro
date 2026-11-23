@@ -1,0 +1,3 @@
+Coloque aqui a logo do Control Desk com o nome: logo-control-desk.png
+Logo da Funchal (opcional): logo-funchal.png
+Os nomes dos arquivos podem ser trocados na aba Config da planilha.
