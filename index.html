@@ -277,7 +277,7 @@ function setData(D,src){DATA=D;SRC=src;C=compute(D);if(!C.ops.find(o=>o.id===sel
 
 /* ---- CONFIGURAÇÃO: id da planilha (trecho entre /d/ e /edit na URL do Google Sheets) ---- */
 const SHEET_ID='1K_5SCBCn_GwvsXUisJh7eHrvti7BPxIkZDgqr5CrP8s';
-const BUILD='20261123141315';
+const BUILD='20261123141745';
 const REFRESH_MS=2*60*1000;
 const EXPECT={config:['chave','valor'],operadores:['nome','equipe'],lancamentos:['data','operador'],casas:['casa','premio'],premios:['nome','icone'],entregas:['operador','casa']};
 const TABNAME={config:'Config',operadores:'Operadores',lancamentos:'Lancamentos',casas:'Casas',premios:'Premios',entregas:'Entregas'};
@@ -632,8 +632,10 @@ function coachHTML(o){
   const k=C.k,need=Math.ceil((g.h-o.pos)/k),left=C.daysLeft,ppd=left>0?Math.ceil(need/left):Infinity;
   const avg=o.avg,ratio=ppd/Math.max(avg,.5);
   const pr=C.casaP[g.h],dest=g.key==='fim'?'a chegada':(pr?pr.icone+' '+pr.nome:'a casa '+g.h);
+  const early=C.dates.length<3&&left>0;
   let v,cls,icon;
-  if(left===0){cls='hard';icon='⏳';v='A campanha chegou ao fim. Não há mais dias para pontuar.';}
+  if(early){cls='mid';icon='📊';v=`Projeções liberadas a partir do 3º dia lançado. Por enquanto, veja quanto falta e o plano por dia.`;}
+  else if(left===0){cls='hard';icon='⏳';v='A campanha chegou ao fim. Não há mais dias para pontuar.';}
   else if(ratio<=1){cls='ok';icon='✅';v=`No seu ritmo atual (${dec(avg)} pontos por dia) você chega lá.`;}
   else if(ratio<=1.5){cls='mid';icon='💪';v=`Dá para chegar, com um pouco mais do que você faz hoje (${dec(avg)} por dia).`;}
   else{cls='hard';icon='🔥';v=`Exige acelerar bastante: você faz ${dec(avg)} por dia e precisaria de ${ppd}.`;}
@@ -655,13 +657,13 @@ function coachHTML(o){
    <div class="legend" style="margin:0 0 6px">${goals.map(x=>`<button class="chip plain ${x.key===g.key?'on':''}" data-goal="${esc(x.key)}">${esc(x.label)} · ${x.h}</button>`).join('')}</div>
    <div class="verdict ${cls}"><span class="vi">${icon}</span><span>${v}</span></div>
    <div class="facts"><div class="fact"><span>Pontos que faltam</span><b>${need}</b></div><div class="fact"><span>Dias restantes</span><b>${left}</b></div><div class="fact"><span>Por dia, para chegar</span><b>${ppd===Infinity?'—':ppd}</b></div>
-     <div class="fact"><span>Você tem</span><b>${o.pos} pontos</b></div><div class="fact"><span>Objetivo</span><b>${g.h} pontos</b></div><div class="fact"><span>No ritmo atual</span><b style="font-size:14px">${when}</b></div></div>
+     <div class="fact"><span>Você tem</span><b>${o.pos} pontos</b></div><div class="fact"><span>Objetivo</span><b>${g.h} pontos</b></div>${early?'':`<div class="fact"><span>No ritmo atual</span><b style="font-size:14px">${when}</b></div>`}</div>
    ${plan?`<div><small style="color:var(--muted)">Plano diário para chegar à casa ${g.h} para ${dest}:</small><div class="plan">${plan}</div></div>`:''}
    ${mix?`<div class="mix"><b>Receita para um dia de ${ppd} ${ppd===1?'ponto':'pontos'}:</b> ${mix}.<br><small style="color:var(--muted)">Baseada no que você mais faz. Cada atraso ou falta tira 1 ponto. ${esc(eqNote)}</small></div>`:''}
    ${C.modo==='pouso'?`<p class="sub" style="margin:10px 0 0">Nesta campanha o prêmio vale quando você <b>para</b> na casa no fim do dia. Feche o dia exatamente na casa ${g.h}.</p>`:''}
    ${rankTxt?`<p style="margin:12px 0 0">${rankTxt}</p>`:''}
-   <h3 style="margin-top:16px;font-size:17px">Até onde você chega</h3>
-   <div class="tscroll"><table><thead><tr><th>Cenário</th><th class="n">Ritmo</th><th class="n">Casa no fim</th></tr></thead><tbody>${scenRows}</tbody></table></div></section>`;
+   ${early?'':`<h3 style="margin-top:16px;font-size:17px">Até onde você chega</h3>
+   <div class="tscroll"><table><thead><tr><th>Cenário</th><th class="n">Ritmo</th><th class="n">Casa no fim</th></tr></thead><tbody>${scenRows}</tbody></table></div>`}</section>`;
 }
 function vPainel(){
   const o=C.ops.find(x=>x.id===selOp);
